@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AtölyeAI Ultra</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtölyeAI Nexus</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
-    <div class="logo-orb">⚡</div>
-    <h1>AtölyeAI Ultra</h1>
-    <p>Akıllı atölye kontrol merkezi</p>
+    <div class="logo">⚡</div>
+    <h1>AtölyeAI Nexus</h1>
+    <p>Ultra profesyonel atölye kontrol sistemi</p>
     <input id="loginUsername" placeholder="Kullanıcı adı">
     <input id="loginCode" placeholder="Kod: ATLY-0001">
     <button onclick="login()">🚀 Giriş Yap</button>
@@ -20,19 +20,29 @@
   </div>
 </div>
 
+<div id="updateModal" class="modal hidden">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeUpdateModal()">×</button>
+    <h2>🚀 Sistem Güncellemesi</h2>
+    <h3 id="updateTitleText"></h3>
+    <p id="updateDescText"></p>
+  </div>
+</div>
+
 <div id="app" class="app hidden">
   <aside class="sidebar">
-    <h2>⚡ AtölyeAI</h2>
+    <h2>⚡ Nexus</h2>
     <button onclick="showPage('dashboard')">🏠 Ana Sayfa</button>
-    <button onclick="showPage('stock')">📦 Stoklar</button>
+    <button onclick="showPage('stock')">📦 Stok Yönetimi</button>
     <button onclick="showPage('stockCheck')">🔎 Stok Sorgula</button>
+    <button onclick="showPage('categories')">🏷️ Kategoriler</button>
     <button onclick="showPage('projects')">🛠️ Projeler</button>
     <button onclick="showPage('orders')">🛒 Siparişler</button>
     <button onclick="showPage('messages')">💬 Mesajlar</button>
     <button onclick="showPage('ai')">🤖 AI Asistan</button>
     <button onclick="showPage('reports')">📊 Raporlar</button>
     <button id="adminBtn" onclick="showPage('admin')">👑 Admin</button>
-    <button onclick="toggleTheme()">🌙 / ☀️ Tema</button>
+    <button onclick="toggleTheme()">🌙 Tema</button>
     <button onclick="logout()">🚪 Çıkış</button>
   </aside>
 
@@ -40,26 +50,26 @@
     <header class="topbar">
       <div>
         <h1 id="welcomeTitle">Hoş geldin</h1>
-        <p>Atölye kontrol panelin hazır.</p>
+        <p>Atölye kontrol merkezin aktif.</p>
       </div>
-      <div class="profile-mini">
+      <div class="profile">
         <div class="avatar">👤</div>
         <div>
-          <b id="userInfo">Kullanıcı</b>
-          <small id="userCodeInfo">Kod</small>
+          <b id="userInfo"></b>
+          <small id="userCodeInfo"></small>
         </div>
       </div>
     </header>
 
     <section id="dashboard" class="page">
-      <div class="dashboard-layout">
+      <div class="layout">
         <div>
-          <div class="cards">
-            <div class="stat-card blue"><span>📦</span><h3>Ürün</h3><p id="totalProducts">0</p></div>
-            <div class="stat-card amber"><span>⚠️</span><h3>Az Stok</h3><p id="lowStockCount">0</p></div>
-            <div class="stat-card purple"><span>🛠️</span><h3>Aktif Proje</h3><p id="activeProjectCount">0</p></div>
-            <div class="stat-card cyan"><span>🚚</span><h3>Bekleyen</h3><p id="pendingOrderCount">0</p></div>
-            <div class="stat-card green"><span>💸</span><h3>Harcama</h3><p id="totalSpend">0 TL</p></div>
+          <div class="stats">
+            <div class="stat blue"><span>📦</span><h3>Ürün</h3><p id="totalProducts">0</p></div>
+            <div class="stat amber"><span>⚠️</span><h3>Az Stok</h3><p id="lowStockCount">0</p></div>
+            <div class="stat purple"><span>🛠️</span><h3>Proje</h3><p id="activeProjectCount">0</p></div>
+            <div class="stat cyan"><span>🚚</span><h3>Bekleyen</h3><p id="pendingOrderCount">0</p></div>
+            <div class="stat green"><span>💸</span><h3>Harcama</h3><p id="totalSpend">0 TL</p></div>
           </div>
 
           <div class="finance-panel">
@@ -67,28 +77,28 @@
               <h2>📊 Harcama Grafiği</h2>
               <canvas id="spendChart"></canvas>
             </div>
-            <div class="panel summary-box">
+            <div class="panel summary">
               <p>🛒 Sepet: <b id="cartTotal">0 TL</b></p>
               <p>✅ Teslim: <b id="deliveredTotal">0 TL</b></p>
               <p>🚚 Bekleyen: <b id="waitingTotal">0 TL</b></p>
             </div>
           </div>
 
-          <div class="mini-grid">
+          <div class="grid">
             <div class="panel"><h2>📦 Stok Özeti</h2><div id="stockMini"></div></div>
-            <div class="panel"><h2>🛠️ Proje Özeti</h2><div id="projectMini"></div></div>
+            <div class="panel"><h2>🏷️ Kategoriler</h2><div id="categoryMini"></div></div>
             <div class="panel"><h2>🛒 Alınacaklar</h2><div id="buyList"></div></div>
             <div class="panel"><h2>🔔 Bildirimler</h2><div id="notifications"></div></div>
           </div>
         </div>
 
         <aside class="right-panel">
-          <h2>⚡ Hızlı Kısayollar</h2>
-          <div class="quick-actions">
+          <h2>⚡ Hızlı Panel</h2>
+          <div class="quick">
             <button onclick="showPage('stock')">➕ Ürün Ekle</button>
-            <button onclick="showPage('projects')">🛠️ Proje Aç</button>
-            <button onclick="showPage('orders')">🛒 Sipariş Gir</button>
-            <button onclick="showPage('ai')">🤖 AI Sor</button>
+            <button onclick="showPage('stockCheck')">🔎 Stok Sorgula</button>
+            <button onclick="showPage('categories')">🏷️ Kategori Aç</button>
+            <button onclick="showPage('admin')">📢 Güncelleme Yayınla</button>
           </div>
 
           <div class="account-card">
@@ -112,7 +122,7 @@
       <div class="form grid-form">
         <input id="partName" placeholder="Ürün adı">
         <input id="partCode" placeholder="Ürün kodu">
-        <input id="partCategory" placeholder="Kategori">
+        <select id="partCategory"></select>
         <input id="partCount" type="number" placeholder="Adet">
         <input id="partMin" type="number" placeholder="Minimum stok">
         <input id="partBox" placeholder="Kutu">
@@ -124,16 +134,24 @@
       </div>
       <div id="stockList" class="list"></div>
     </section>
+
     <section id="stockCheck" class="page hidden">
-  <h1>🔎 Stok Durumu Sorgula</h1>
+      <h1>🔎 Stok Durumu Sorgula</h1>
+      <div class="form">
+        <input id="stockSearchInput" placeholder="Ürün adı, kod veya kategori yaz">
+        <button onclick="checkStock()">🔍 Sorgula</button>
+      </div>
+      <div id="stockCheckResult" class="list"></div>
+    </section>
 
-  <div class="form">
-    <input id="stockSearchInput" placeholder="Ürün adı veya kod yaz: LCD, UNO, SNS-001">
-    <button onclick="checkStock()">🔍 Sorgula</button>
-  </div>
-
-  <div id="stockCheckResult" class="list"></div>
-</section>
+    <section id="categories" class="page hidden">
+      <h1>🏷️ Kategori Yönetimi</h1>
+      <div class="form">
+        <input id="categoryName" placeholder="Kategori adı: Mekanik, Elektronik, Sensör...">
+        <button onclick="addCategory()">➕ Kategori Ekle</button>
+      </div>
+      <div id="categoryList" class="list"></div>
+    </section>
 
     <section id="projects" class="page hidden">
       <h1>🛠️ Proje Yönetimi</h1>
@@ -188,22 +206,29 @@
       <h1>🤖 AtölyeAI Asistan</h1>
       <div class="ai-box">
         <div id="aiChat" class="ai-chat"></div>
-        <input id="aiInput" placeholder="Örn: Eksik parçalar ne? Hangi projeyi yapabilirim?">
+        <input id="aiInput" placeholder="Eksik parçalar ne? Hangi proje yapılır? Kategori raporu çıkar.">
         <button onclick="askAI()">🤖 AI'ye Sor</button>
       </div>
     </section>
 
     <section id="reports" class="page hidden">
       <h1>📊 Raporlar</h1>
-      <div class="mini-grid">
-        <div class="panel"><h2>📦 Kategori Raporu</h2><div id="categoryReport"></div></div>
+      <div class="grid">
+        <div class="panel"><h2>🏷️ Kategori Raporu</h2><div id="categoryReport"></div></div>
         <div class="panel"><h2>💸 Sipariş Raporu</h2><div id="orderReport"></div></div>
       </div>
     </section>
 
     <section id="admin" class="page hidden">
       <h1>👑 Admin Kontrol Paneli</h1>
-      <p>Hazır kodlar: <b>ATLY-0001</b> → <b>ATLY-9999</b></p>
+
+      <div class="panel">
+        <h2>📢 Güncelleme Bildirimi Yayınla</h2>
+        <input id="updateTitle" placeholder="Güncelleme başlığı">
+        <input id="updateDesc" placeholder="Neler değişti?">
+        <button onclick="publishUpdate()">🚀 Güncellemeyi Yayınla</button>
+      </div>
+
       <div class="form">
         <input id="searchCode" placeholder="Kod veya kullanıcı ara">
         <button onclick="renderAdmin()">🔍 Ara / Yenile</button>
