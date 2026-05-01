@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AtölyeAI</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <h1>⚡ AtölyeAI</h1>
-    <p>Kodla giriş sistemi</p>
-    <input id="loginUsername" placeholder="Kullanıcı adı">
-    <input id="loginCode" placeholder="Kod: ATLY-0001">
+    <p>Akıllı atölye yönetim sistemi</p>
+    <input id="loginUsername" placeholder="Kullanıcı adı" />
+    <input id="loginCode" placeholder="Kod: ATLY-0001" />
     <button onclick="login()">🚀 Giriş Yap</button>
     <small>Admin: <b>Admin / ADMIN-0001</b></small>
   </div>
@@ -27,40 +27,68 @@
     <button onclick="showPage('projects')">🛠️ Projeler</button>
     <button onclick="showPage('orders')">🛒 Siparişler</button>
     <button onclick="showPage('messages')">💬 Mesajlar</button>
-    <button id="adminMenuBtn" onclick="showPage('admin')">👑 Admin Paneli</button>
+    <button id="adminMenuBtn" onclick="showPage('admin')">👑 Admin</button>
     <button onclick="toggleTheme()">🌙 / ☀️ Tema</button>
     <button onclick="logout()">🚪 Çıkış</button>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <b id="userInfo"></b>
+      <div>
+        <b id="userInfo"></b>
+        <p>Bugünkü panelin hazır ✅</p>
+      </div>
     </header>
 
     <section id="dashboard" class="page">
       <h1>🏠 Ana Sayfa</h1>
-      <div class="cards">
-        <div class="card"><h3>📦 Toplam Ürün</h3><p id="totalProducts">0</p></div>
-        <div class="card"><h3>⚠️ Minimum Altı</h3><p id="lowStockCount">0</p></div>
-        <div class="card"><h3>🛠️ Aktif Proje</h3><p id="activeProjectCount">0</p></div>
-        <div class="card"><h3>🚚 Bekleyen Sipariş</h3><p id="pendingOrderCount">0</p></div>
-        <div class="card"><h3>💸 Toplam Harcama</h3><p id="totalSpend">0 TL</p></div>
-      </div>
 
-      <div class="grid">
-        <div class="panel">
-          <h2>🔔 Bildirimler</h2>
-          <div id="notifications"></div>
+      <div class="dashboard-layout">
+        <div>
+          <div class="cards">
+            <div class="card"><h3>📦 Ürün</h3><p id="totalProducts">0</p></div>
+            <div class="card"><h3>⚠️ Az Stok</h3><p id="lowStockCount">0</p></div>
+            <div class="card"><h3>🛠️ Proje</h3><p id="activeProjectCount">0</p></div>
+            <div class="card"><h3>🚚 Sipariş</h3><p id="pendingOrderCount">0</p></div>
+            <div class="card"><h3>💸 Harcama</h3><p id="totalSpend">0 TL</p></div>
+          </div>
+
+          <div class="mini-grid">
+            <div class="panel">
+              <h2>📦 Stok Özeti</h2>
+              <div id="stockMini"></div>
+            </div>
+
+            <div class="panel">
+              <h2>🛠️ Proje Özeti</h2>
+              <div id="projectMini"></div>
+            </div>
+
+            <div class="panel">
+              <h2>🛒 Alınacaklar</h2>
+              <div id="buyList"></div>
+            </div>
+
+            <div class="panel">
+              <h2>🔔 Bildirimler</h2>
+              <div id="notifications"></div>
+            </div>
+          </div>
         </div>
-        <div class="panel">
-          <h2>🛒 Alınacaklar</h2>
-          <div id="buyList"></div>
-        </div>
+
+        <aside class="right-panel">
+          <h2>👥 Aktif Kullanıcılar</h2>
+          <div id="activeUsers"></div>
+
+          <h2>💬 Son Mesajlar</h2>
+          <div id="lastMessages"></div>
+        </aside>
       </div>
     </section>
 
     <section id="stock" class="page hidden">
       <h1>📦 Stok Takip</h1>
+
       <div class="form">
         <input id="partName" placeholder="Ürün adı">
         <input id="partCode" placeholder="Ürün kodu">
@@ -69,15 +97,18 @@
         <input id="partMin" type="number" placeholder="Minimum stok">
         <input id="partBox" placeholder="Kutu">
         <input id="partShelf" placeholder="Raf / reyon">
+        <input id="partPhoto" placeholder="Fotoğraf linki">
         <input id="partNote" placeholder="Not">
         <button onclick="savePart()">💾 Kaydet</button>
         <button onclick="clearPartForm()">🧹 Temizle</button>
       </div>
+
       <div id="stockList" class="list"></div>
     </section>
 
     <section id="projects" class="page hidden">
-      <h1>🛠️ Aktif Projeler</h1>
+      <h1>🛠️ Projeler</h1>
+
       <div class="form">
         <input id="projectName" placeholder="Proje adı">
         <select id="projectStatus">
@@ -85,15 +116,17 @@
           <option>Devam ediyor</option>
           <option>Bitti</option>
         </select>
-        <input id="projectParts" placeholder="Gerekli parçalar">
+        <input id="projectParts" placeholder="Malzemeler: LCD, Arduino Uno, DHT11">
         <input id="projectNote" placeholder="Not">
         <button onclick="addProject()">➕ Proje Ekle</button>
       </div>
+
       <div id="projectList" class="list"></div>
     </section>
 
     <section id="orders" class="page hidden">
       <h1>🛒 Siparişler</h1>
+
       <div class="form">
         <input id="orderName" placeholder="Ürün adı">
         <input id="orderCount" type="number" placeholder="Adet">
@@ -108,25 +141,35 @@
         </select>
         <button onclick="addOrder()">➕ Sipariş Ekle</button>
       </div>
+
       <div id="orderList" class="list"></div>
     </section>
 
     <section id="messages" class="page hidden">
       <h1>💬 Mesajlaşma</h1>
+
       <div class="form">
+        <select id="messageType">
+          <option value="general">Genel Sohbet</option>
+          <option value="private">Özel Sohbet</option>
+        </select>
+        <input id="messageTo" placeholder="Özel sohbet için kullanıcı adı">
         <input id="messageText" placeholder="Mesaj yaz">
         <button onclick="sendMessage()">📨 Gönder</button>
       </div>
+
       <div id="messageList" class="list"></div>
     </section>
 
     <section id="admin" class="page hidden">
       <h1>👑 Admin Paneli</h1>
       <p>Hazır kodlar: <b>ATLY-0001</b> → <b>ATLY-9999</b></p>
+
       <div class="form">
         <input id="searchCode" placeholder="Kod veya kullanıcı ara">
         <button onclick="renderAdmin()">🔍 Ara / Yenile</button>
       </div>
+
       <div id="codeList" class="list"></div>
     </section>
   </main>
