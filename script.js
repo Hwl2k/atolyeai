@@ -4,11 +4,11 @@ let editingPartId = null;
 let users = JSON.parse(localStorage.getItem("users"));
 
 if (!users) {
-  users = [{ username:"Admin", code:"ADMIN-0001", role:"admin", active:true }];
+  users = [{ username:"Admin", code:"ADMIN-0001", role:"admin", active:true, lastSeen:"-" }];
 
   for (let i = 1; i <= 9999; i++) {
     let num = String(i).padStart(4, "0");
-    users.push({ username:"", code:"ATLY-" + num, role:"user", active:true });
+    users.push({ username:"", code:"ATLY-" + num, role:"user", active:true, lastSeen:"-" });
   }
 
   localStorage.setItem("users", JSON.stringify(users));
@@ -44,6 +44,7 @@ function login(){
   if(!user.username) user.username = username;
   if(user.username !== username) return alert("Bu kod başka kullanıcıya ait.");
 
+  user.lastSeen = new Date().toLocaleString("tr-TR");
   currentUser = user;
   saveData();
 
@@ -85,6 +86,7 @@ function savePart(){
     min: Number(document.getElementById("partMin").value) || 0,
     box: document.getElementById("partBox").value.trim(),
     shelf: document.getElementById("partShelf").value.trim(),
+    photo: document.getElementById("partPhoto").value.trim(),
     note: document.getElementById("partNote").value.trim()
   };
 
@@ -106,13 +108,15 @@ function editPart(id){
 
   editingPartId = id;
   document.getElementById("partName").value = p.name;
-  document.getElementById("partCode").value = p.code;
-  document.getElementById("partCategory").value = p.category;
-  document.getElementById("partCount").value = p.count;
-  document.getElementById("partMin").value = p.min;
-  document.getElementById("partBox").value = p.box;
-  document.getElementById("partShelf").value = p.shelf;
-  document.getElementById("partNote").value = p.note;
+  document.getElementById("partCode").value = p.code || "";
+  document.getElementById("partCategory").value = p.category || "";
+  document.getElementById("partCount").value = p.count || 0;
+  document.getElementById("partMin").value = p.min || 0;
+  document.getElementById("partBox").value = p.box || "";
+  document.getElementById("partShelf").value = p.shelf || "";
+  document.getElementById("partPhoto").value = p.photo || "";
+  document.getElementById("partNote").value = p.note || "";
+  showPage("stock");
 }
 
 function deletePart(id){
@@ -124,7 +128,7 @@ function deletePart(id){
 
 function clearPartForm(){
   editingPartId = null;
-  ["partName","partCode","partCategory","partCount","partMin","partBox","partShelf","partNote"]
+  ["partName","partCode","partCategory","partCount","partMin","partBox","partShelf","partPhoto","partNote"]
     .forEach(id => document.getElementById(id).value = "");
 }
 
@@ -175,10 +179,7 @@ function addOrder(){
     status: document.getElementById("orderStatus").value
   });
 
-  document.getElementById("orderName").value = "";
-  document.getElementById("orderCount").value = "";
-  document.getElementById("orderPrice").value = "";
-  document.getElementById("orderLink").value = "";
+  ["orderName","orderCount","orderPrice","orderLink"].forEach(id => document.getElementById(id).value = "");
 
   saveData();
   renderAll();
@@ -200,11 +201,17 @@ function deleteOrder(id){
 
 function sendMessage(){
   const text = document.getElementById("messageText").value.trim();
+  const type = document.getElementById("messageType").value;
+  const to = document.getElementById("messageTo").value.trim();
+
   if(!text) return;
+  if(type === "private" && !to) return alert("Özel mesaj için kullanıcı adı yaz.");
 
   messages.push({
     id: Date.now(),
     user: currentUser.username,
+    to,
+    type,
     text,
     date: new Date().toLocaleString("tr-TR")
   });
@@ -237,6 +244,27 @@ function resetCode(code){
   renderAdmin();
 }
 
+function getMaterialStatus(name){
+  const clean = name.trim().toLowerCase();
+  const found = parts.find(p => p.name.toLowerCase().includes(clean) || (p.code || "").toLowerCase().includes(clean));
+
+  if(!found) return `<span class="badge bad">❌ ${name} yok</span>`;
+  if(found.count <= 0) return `<span class="badge bad">❌ ${name} bitti</span>`;
+  if(found.count < found.min) return `<span class="badge warn">⚠️ ${name} az (${found.count})</span>`;
+  return `<span class="badge ok">✅ ${name} var (${found.count})</span>`;
+}
+
+function renderProjectMaterials(project){
+  if(!project.parts) return "<p>Malzeme yazılmamış.</p>";
+
+  return project.parts
+    .split(",")
+    .map(x => x.trim())
+    .filter(Boolean)
+    .map(getMaterialStatus)
+    .join(" ");
+}
+
 function renderAll(){
   renderDashboard();
   renderStock();
@@ -248,19 +276,34 @@ function renderAll(){
 
 function renderDashboard(){
   const low = parts.filter(p => p.count < p.min);
+  const activeProjects = projects.filter(p => p.status !== "Bitti");
+  const pendingOrders = orders.filter(o => o.status !== "Teslim edildi" && o.status !== "İptal edildi");
 
   document.getElementById("totalProducts").innerText = parts.length;
   document.getElementById("lowStockCount").innerText = low.length;
-  document.getElementById("activeProjectCount").innerText = projects.filter(p => p.status !== "Bitti").length;
-  document.getElementById("pendingOrderCount").innerText = orders.filter(o => o.status !== "Teslim edildi" && o.status !== "İptal edildi").length;
+  document.getElementById("activeProjectCount").innerText = activeProjects.length;
+  document.getElementById("pendingOrderCount").innerText = pendingOrders.length;
   document.getElementById("totalSpend").innerText = orders.reduce((s,o) => s + o.price, 0) + " TL";
 
   document.getElementById("notifications").innerHTML =
-    low.length ? low.map(p => `<p>⚠️ ${p.name} minimum stok altında.</p>`).join("") : "<p>✅ Bildirim yok.</p>";
+    low.length ? low.slice(0,5).map(p => `<p>⚠️ ${p.name} minimum stok altında.</p>`).join("") : "<p>✅ Bildirim yok.</p>";
 
   const buy = orders.filter(o => o.status === "Alınacak");
   document.getElementById("buyList").innerHTML =
-    buy.length ? buy.map(o => `<p>🛒 ${o.name} - ${o.count} adet</p>`).join("") : "<p>✅ Alınacak ürün yok.</p>";
+    buy.length ? buy.slice(0,5).map(o => `<p>🛒 ${o.name} - ${o.count} adet</p>`).join("") : "<p>✅ Alınacak ürün yok.</p>";
+
+  document.getElementById("stockMini").innerHTML =
+    parts.length ? parts.slice(-4).reverse().map(p => `<p>🔧 ${p.name} — ${p.count} adet</p>`).join("") : "<p>Ürün yok.</p>";
+
+  document.getElementById("projectMini").innerHTML =
+    activeProjects.length ? activeProjects.slice(0,3).map(p => `<p>🛠️ ${p.name} — ${p.status}</p>`).join("") : "<p>Aktif proje yok.</p>";
+
+  const active = users.filter(u => u.username && u.active).slice(0,8);
+  document.getElementById("activeUsers").innerHTML =
+    active.length ? active.map(u => `<p>🟢 ${u.username}<br><small>${u.lastSeen || "-"}</small></p>`).join("") : "<p>Aktif kullanıcı yok.</p>";
+
+  document.getElementById("lastMessages").innerHTML =
+    messages.length ? messages.slice(-5).reverse().map(m => `<p>💬 <b>${m.user}</b>: ${m.text}</p>`).join("") : "<p>Mesaj yok.</p>";
 }
 
 function renderStock(){
@@ -269,6 +312,7 @@ function renderStock(){
 
   area.innerHTML = parts.map(p => `
     <div class="item">
+      ${p.photo ? `<img class="product-img" src="${p.photo}" alt="${p.name}">` : ""}
       <div class="item-text">
         <b>🔧 ${p.name}</b><br>
         🏷️ Kod: ${p.code || "-"}<br>
@@ -294,8 +338,11 @@ function renderProjects(){
       <div class="item-text">
         <b>🛠️ ${p.name}</b><br>
         Durum: ${p.status}<br>
-        Parçalar: ${p.parts || "-"}<br>
         Not: ${p.note || "-"}
+        <div class="project-materials">
+          <b>Malzeme Durumu:</b><br>
+          ${renderProjectMaterials(p)}
+        </div>
       </div>
       <div>
         <select onchange="changeProjectStatus(${p.id}, this.value)">
@@ -340,10 +387,18 @@ function renderMessages(){
   const area = document.getElementById("messageList");
   if(!messages.length){ area.innerHTML = "<p>💬 Henüz mesaj yok.</p>"; return; }
 
-  area.innerHTML = messages.map(m => `
-    <div class="item message-bubble">
+  const visibleMessages = messages.filter(m => {
+    if(!currentUser) return false;
+    if(m.type === "general") return true;
+    return m.user === currentUser.username || m.to === currentUser.username || currentUser.role === "admin";
+  });
+
+  area.innerHTML = visibleMessages.map(m => `
+    <div class="item ${m.type === "private" ? "private-bubble" : "message-bubble"}">
       <div class="item-text">
-        <b>👤 ${m.user}</b> <small>🕒 ${m.date}</small><br>
+        <b>👤 ${m.user}</b>
+        ${m.type === "private" ? `➡️ <b>${m.to}</b>` : "🌍 Genel"}
+        <small>🕒 ${m.date}</small><br>
         💬 ${m.text}
       </div>
       ${currentUser && currentUser.role === "admin" ? `<button class="small-btn danger" onclick="deleteMessage(${m.id})">🗑️ Sil</button>` : ""}
@@ -355,7 +410,9 @@ function renderAdmin(){
   const area = document.getElementById("codeList");
   const search = document.getElementById("searchCode").value.trim().toUpperCase();
 
-  let list = search ? users.filter(u => u.code.includes(search) || u.username.toUpperCase().includes(search)) : users.slice(0,50);
+  let list = search
+    ? users.filter(u => u.code.includes(search) || u.username.toUpperCase().includes(search))
+    : users.slice(0,50);
 
   area.innerHTML = list.map(u => `
     <div class="item">
@@ -363,6 +420,7 @@ function renderAdmin(){
         <b>${u.code}</b><br>
         Kullanıcı: ${u.username || "Boşta"}<br>
         Rol: ${u.role}<br>
+        Son giriş: ${u.lastSeen || "-"}<br>
         Durum: ${u.active ? "Aktif" : "İptal"}
       </div>
       ${u.role !== "admin" ? `
