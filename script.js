@@ -111,3 +111,58 @@ function drawChart(cart,delivered,waiting){
   let arr=[["Sepet",cart,"#2563eb"],["Teslim",delivered,"#22c55e"],["Bekleyen",waiting,"#f59e0b"]],max=Math.max(cart,delivered,waiting,1),bw=w/3-35;
   arr.forEach((a,i)=>{let x=i*(bw+35)+20,bh=a[1]/max*105,y=h-bh-35;ctx.fillStyle=a[2];ctx.roundRect(x,y,bw,bh,12);ctx.fill();ctx.fillStyle=document.body.classList.contains("dark")?"#fff":"#111827";ctx.font="bold 13px Arial";ctx.fillText(a[0],x,h-12);ctx.fillText(a[1]+" TL",x,y-8)})
 }
+function checkStock(){
+  const text = document.getElementById("stockSearchInput").value.trim().toLowerCase();
+  const result = document.getElementById("stockCheckResult");
+
+  if(!text){
+    result.innerHTML = "<p>Önce ürün adı veya kod yaz.</p>";
+    return;
+  }
+
+  const found = parts.filter(p =>
+    p.name.toLowerCase().includes(text) ||
+    (p.code || "").toLowerCase().includes(text) ||
+    (p.category || "").toLowerCase().includes(text)
+  );
+
+  if(found.length === 0){
+    result.innerHTML = `
+      <div class="item">
+        <div class="item-text">
+          ❌ Ürün bulunamadı.<br>
+          İstersen bunu sipariş listesine ekleyebilirsin.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  result.innerHTML = found.map(p => {
+    let status = "✅ Stok yeterli";
+    let badgeClass = "ok";
+
+    if(p.count <= 0){
+      status = "❌ Stok bitti";
+      badgeClass = "bad";
+    } else if(p.count < p.min){
+      status = "⚠️ Minimum stok altında";
+      badgeClass = "warn";
+    }
+
+    return `
+      <div class="item">
+        ${p.photo ? `<img class="product-img" src="${p.photo}" alt="${p.name}">` : ""}
+        <div class="item-text">
+          <b>🔧 ${p.name}</b><br>
+          🏷️ Kod: ${p.code || "-"}<br>
+          📁 Kategori: ${p.category || "-"}<br>
+          📦 Adet: ${p.count}<br>
+          ⚠️ Minimum: ${p.min}<br>
+          🗃️ Konum: ${p.box || "-"} / ${p.shelf || "-"}<br>
+          <span class="badge ${badgeClass}">${status}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
