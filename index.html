@@ -3,31 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DepoPanel Pro</title>
+<title>AtölyeAI Pro</title>
 <style>
 *{box-sizing:border-box}
-:root{
-  --bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#6b7280;
-  --line:#e5e7eb;--main:#4f46e5;--main2:#7c3aed;--soft:#f3f4f6;
-}
-.dark{
-  --bg:#080c14;--card:#101827;--text:#eef3ff;--muted:#9ca3af;
-  --line:#26324a;--soft:#1b2540;
-}
+:root{--bg:#f4f6fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--main:#2563eb;--main2:#7c3aed;--soft:#f3f4f6}
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
 .hidden{display:none!important}
 button{border:0;border-radius:12px;padding:12px 14px;background:linear-gradient(90deg,var(--main),var(--main2));color:white;font-weight:800;cursor:pointer}
-button:hover{opacity:.9}
-input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);margin:7px 0}
-.login{min-height:100vh;display:grid;grid-template-columns:1fr 480px;gap:30px;padding:45px;background:linear-gradient(135deg,var(--bg),var(--soft))}
+input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--text);margin:7px 0}
+.login{min-height:100vh;display:grid;grid-template-columns:1fr 430px;gap:30px;padding:45px;background:linear-gradient(135deg,#eef2ff,#f8fafc)}
 .hero{display:flex;flex-direction:column;justify-content:center;padding-left:40px}
-.hero h1{font-size:64px;margin:0}.hero span{color:var(--main)}
-.hero p{color:var(--muted);font-size:22px}
+.hero h1{font-size:64px;margin:0}.hero span{color:var(--main2)}.hero p{color:var(--muted);font-size:22px}
 .login-card,.panel,.card,.sidebar,.topbar,.item{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 30px #0001}
 .login-card{padding:32px;align-self:center}
 .app{display:flex;min-height:100vh}
 .sidebar{width:260px;border-radius:0;padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
-.sidebar h2{margin-top:0}
 .sidebar button{width:100%;margin:6px 0;text-align:left;background:var(--soft);color:var(--text)}
 .sidebar button:hover{background:var(--main);color:white}
 .main{flex:1;padding:18px}
@@ -46,11 +36,7 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
 .ok{background:#dcfce7;color:#166534}.warn{background:#fef3c7;color:#92400e}.bad{background:#fee2e2;color:#991b1b}
 .small{width:auto;padding:8px 10px}.danger{background:#dc2626}.success{background:#16a34a}
 .photo{width:70px;height:55px;border-radius:10px;object-fit:cover}
-.google-float{position:fixed;right:18px;bottom:18px;z-index:50}
-.google-panel{position:fixed;right:18px;bottom:80px;width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 20px 60px #0004;z-index:60}
-.google-panel iframe{width:100%;height:320px;border:1px solid var(--line);border-radius:12px;background:white}
-.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:99}
-.modal-card{width:min(480px,90%);background:var(--card);border-radius:20px;padding:22px}
+.ai-msg{background:var(--soft);padding:12px;border-radius:12px;margin:8px 0}
 @media(max-width:900px){.login{grid-template-columns:1fr}.hero{display:none}.app{flex-direction:column}.sidebar{width:100%;height:auto;position:static}.stats,.grid,.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -58,50 +44,43 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
 
 <div id="login" class="login">
   <div class="hero">
-    <h1>Depo<span>Panel</span></h1>
-    <p>Akıllı depo, stok, sipariş ve kullanıcı yönetimi.</p>
+    <h1>Atölye<span>AI</span></h1>
+    <p>Stok, proje, sipariş ve atölye yönetim sistemi.</p>
   </div>
 
   <div class="login-card">
     <h2>Hoş geldiniz 👋</h2>
-    <input id="email" type="email" placeholder="E-posta">
-    <input id="pass" type="password" placeholder="Şifre">
+    <p>Kullanıcı adı ve kod ile giriş yap.</p>
+    <input id="uName" placeholder="Kullanıcı adı">
+    <input id="uCode" placeholder="Kod: ATLY-0001">
+    <input id="uPin" type="password" placeholder="PIN varsa yaz">
     <label><input id="remember" type="checkbox"> Beni hatırla</label>
     <button onclick="loginUser()">Giriş Yap</button>
-    <button onclick="createUser()">Hesap Oluştur</button>
-    <button onclick="openAdmin()">Admin Girişi</button>
-  </div>
-</div>
-
-<div id="adminModal" class="modal hidden">
-  <div class="modal-card">
-    <h2>Admin Girişi</h2>
-    <input id="adminEmail" placeholder="Admin e-posta">
-    <input id="adminPass" type="password" placeholder="Admin şifre">
-    <button onclick="loginAdmin()">Admin Girişi</button>
-    <button onclick="closeAdmin()">Kapat</button>
+    <small>Admin kodu ekranda gösterilmez.</small>
   </div>
 </div>
 
 <div id="app" class="app hidden">
   <aside class="sidebar">
-    <h2>◆ DepoPanel</h2>
+    <h2>◆ AtölyeAI</h2>
     <button onclick="show('home')">🏠 Ana Sayfa</button>
     <button onclick="show('stock')">📦 Stok</button>
     <button onclick="show('search')">🔎 Stok Sorgula</button>
     <button onclick="show('cats')">🏷️ Kategoriler</button>
+    <button onclick="show('projects')">🛠️ Projeler</button>
     <button onclick="show('orders')">🛒 Siparişler</button>
+    <button onclick="show('messages')">💬 Mesajlar</button>
     <button onclick="show('profile')">👤 Profil</button>
+    <button onclick="show('ai')">🤖 AI</button>
     <button id="adminBtn" class="hidden" onclick="show('admin')">👑 Admin</button>
-    <button onclick="toggleTheme()">🌓 Tema</button>
     <button onclick="logout()">Çıkış</button>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <input id="globalSearch" placeholder="Hızlı malzeme ara..." oninput="quickSearch()">
+      <input id="globalSearch" placeholder="Hızlı stok ara..." oninput="quickSearch()">
       <button onclick="show('stock')">+ Malzeme Ekle</button>
-      <div class="profile"><img id="photoMini" class="avatar"><div><b id="nameTop"></b><br><small id="roleTop"></small></div></div>
+      <div class="profile"><img id="miniPhoto" class="avatar"><div><b id="topName"></b><br><small id="topRole"></small></div></div>
     </div>
 
     <section id="home" class="page">
@@ -112,8 +91,8 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
         <div class="card"><small>Toplam Değer</small><b id="sValue">0 TL</b></div>
       </div>
       <div class="grid">
-        <div class="panel"><h2>Malzemeler</h2><div id="homeItems"></div></div>
-        <div class="panel"><h2>AI Asistan</h2><p id="aiText">Eksik stokları ve siparişleri analiz eder.</p><button onclick="aiAnalyze()">Analiz Et</button></div>
+        <div class="panel"><h2>Son Malzemeler</h2><div id="homeItems"></div></div>
+        <div class="panel"><h2>AI Asistan</h2><p id="aiText">Eksik stokları ve projeleri analiz eder.</p><button onclick="aiAnalyze()">Analiz Et</button></div>
       </div>
     </section>
 
@@ -154,6 +133,16 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
       <div id="catList" class="list"></div>
     </section>
 
+    <section id="projects" class="page hidden">
+      <h1>Projeler</h1>
+      <div class="panel">
+        <input id="pName" placeholder="Proje adı">
+        <input id="pParts" placeholder="Gerekli parçalar: LCD, Arduino">
+        <button onclick="addProject()">Proje Ekle</button>
+      </div>
+      <div id="projectList" class="list"></div>
+    </section>
+
     <section id="orders" class="page hidden">
       <h1>Siparişler</h1>
       <div class="panel form-grid">
@@ -166,13 +155,31 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
       <div id="orderList" class="list"></div>
     </section>
 
+    <section id="messages" class="page hidden">
+      <h1>Mesajlar</h1>
+      <div class="panel">
+        <input id="msgText" placeholder="Mesaj yaz">
+        <button onclick="sendMsg()">Gönder</button>
+      </div>
+      <div id="msgList" class="list"></div>
+    </section>
+
     <section id="profile" class="page hidden">
       <h1>Profil</h1>
       <div class="panel">
-        <input id="pName" placeholder="İsim">
-        <input id="pPass" type="password" placeholder="Yeni şifre">
-        <input id="pPhoto" placeholder="Foto link">
+        <input id="prName" placeholder="Yeni isim">
+        <input id="prPin" type="password" placeholder="Yeni PIN">
+        <input id="prPhoto" placeholder="Profil foto linki">
         <button onclick="saveProfile()">Kaydet</button>
+      </div>
+    </section>
+
+    <section id="ai" class="page hidden">
+      <h1>AI Asistan</h1>
+      <div class="panel">
+        <div id="aiChat"></div>
+        <input id="aiInput" placeholder="Eksik stokları göster, proje öner...">
+        <button onclick="askAI()">Sor</button>
       </div>
     </section>
 
@@ -181,64 +188,58 @@ input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:
       <div class="panel"><input id="adminSearch" placeholder="Kullanıcı ara" oninput="renderAdmin()"></div>
       <div class="grid">
         <div class="panel"><h2>Kullanıcılar</h2><div id="adminUsers"></div></div>
-        <div class="panel"><h2>Seçili Kullanıcı Envanteri</h2><div id="adminInventory"></div></div>
+        <div class="panel"><h2>Seçili Envanter</h2><div id="adminInventory"></div></div>
       </div>
     </section>
   </main>
 </div>
 
-<button class="google-float" onclick="toggleGoogle()">🌐 Google</button>
-<div id="googlePanel" class="google-panel hidden">
-  <input id="googleQuery" placeholder="Google'da ara">
-  <button onclick="googleSearch()">Ara</button>
-  <button onclick="googleOpen()">Yeni Sekmede Aç</button>
-  <iframe id="googleFrame"></iframe>
-</div>
-
 <script>
-let current=null, editId=null, adminViewing=null;
+let current=null, editId=null, adminView=null;
 const $=id=>document.getElementById(id);
-const avatar="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' rx='40' fill='%234f46e5'/%3E%3Ctext x='40' y='50' font-size='34' text-anchor='middle' fill='white'%3ED%3C/text%3E%3C/svg%3E";
+const avatar="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' rx='40' fill='%232563eb'/%3E%3Ctext x='40' y='50' font-size='34' text-anchor='middle' fill='white'%3EA%3C/text%3E%3C/svg%3E";
 let users=JSON.parse(localStorage.users||"[]");
 let items=JSON.parse(localStorage.items||"[]");
 let cats=JSON.parse(localStorage.cats||'["Elektronik","Mekanik","Kıyafet","Sensör","Kablo","Diğer"]');
 let orders=JSON.parse(localStorage.orders||"[]");
-if(!users.length){users.push({email:"admin@depopanel.local",pass:"ADMIN-0001",name:"Admin",role:"admin",photo:avatar,online:false,last:"-"})}
-function save(){localStorage.users=JSON.stringify(users);localStorage.items=JSON.stringify(items);localStorage.cats=JSON.stringify(cats);localStorage.orders=JSON.stringify(orders)}
-function openAdmin(){$("adminModal").classList.remove("hidden")}
-function closeAdmin(){$("adminModal").classList.add("hidden")}
-function loginUser(){let e=$("email").value.trim().toLowerCase(),p=$("pass").value;if(!e||!p)return alert("E-posta ve şifre yaz.");let u=users.find(x=>x.email===e&&x.pass===p&&x.role!=="admin");if(!u)return alert("Hesap yok veya şifre yanlış.");start(u)}
-function loginAdmin(){let e=$("adminEmail").value.trim().toLowerCase(),p=$("adminPass").value;let u=users.find(x=>x.email===e&&x.pass===p&&x.role==="admin");if(!u)return alert("Admin bilgisi yanlış.");closeAdmin();start(u)}
-function createUser(){let e=$("email").value.trim().toLowerCase(),p=$("pass").value;if(!e||!p)return alert("E-posta ve şifre yaz.");if(users.some(x=>x.email===e))return alert("Bu e-posta kayıtlı.");let u={email:e,pass:p,name:e.split("@")[0],role:"user",photo:avatar,online:false,last:"-"};users.push(u);save();start(u)}
-function start(u){current=u;u.online=true;u.last=new Date().toLocaleString("tr-TR");if($("remember").checked)localStorage.session=u.email;save();$("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminBtn").classList.toggle("hidden",u.role!=="admin");renderAll();show("home")}
+let projects=JSON.parse(localStorage.projects||"[]");
+let msgs=JSON.parse(localStorage.msgs||"[]");
+
+if(!users.length){
+  users.push({name:"Admin",code:"ADMIN-0001",pin:"",role:"admin",photo:avatar,online:false,last:"-"});
+  for(let i=1;i<=9999;i++)users.push({name:"",code:"ATLY-"+String(i).padStart(4,"0"),pin:"",role:"user",photo:avatar,online:false,last:"-"});
+}
+function save(){localStorage.users=JSON.stringify(users);localStorage.items=JSON.stringify(items);localStorage.cats=JSON.stringify(cats);localStorage.orders=JSON.stringify(orders);localStorage.projects=JSON.stringify(projects);localStorage.msgs=JSON.stringify(msgs)}
+function loginUser(){let n=$("uName").value.trim(),c=$("uCode").value.trim().toUpperCase(),p=$("uPin").value;if(!n||!c)return alert("İsim ve kod yaz.");let u=users.find(x=>x.code===c);if(!u)return alert("Kod yok.");if(!u.name)u.name=n;if(u.name!==n)return alert("Kod başka kullanıcıya ait.");if(u.pin&&u.pin!==p)return alert("PIN yanlış.");if(!u.pin&&p)u.pin=p;current=u;u.online=true;u.last=new Date().toLocaleString("tr-TR");if($("remember").checked)localStorage.session=u.code;save();$("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminBtn").classList.toggle("hidden",u.role!=="admin");renderAll();show("home")}
 function logout(){if(current){current.online=false;save()}localStorage.removeItem("session");location.reload()}
 function show(id){document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));$(id).classList.remove("hidden");renderAll()}
-function myItems(){return current.role==="admin"&&adminViewing?items.filter(x=>x.owner===adminViewing):items.filter(x=>x.owner===current.email)}
-function renderAll(){renderCats();renderHome();renderItems();renderOrders();renderAdmin();$("nameTop").innerText=current.name;$("roleTop").innerText=current.role;$("photoMini").src=current.photo}
+function myItems(){return current.role==="admin"&&adminView?items.filter(x=>x.owner===adminView):items.filter(x=>x.owner===current.code)}
+function renderAll(){renderCats();renderHome();renderItems();renderOrders();renderProjects();renderMsgs();renderAdmin();$("topName").innerText=current.name;$("topRole").innerText=current.role;$("miniPhoto").src=current.photo}
 function renderCats(){$("iCat").innerHTML=cats.map(c=>`<option>${c}</option>`).join("");$("qCat").innerHTML='<option value="">Tüm Kategoriler</option>'+cats.map(c=>`<option>${c}</option>`).join("");$("catList").innerHTML=cats.map(c=>`<div class="item"><b>${c}</b><button class="small danger" onclick="delCat('${c}')">Sil</button></div>`).join("")}
 function addCat(){let c=$("catName").value.trim();if(!c)return;if(cats.includes(c))return alert("Var.");cats.push(c);$("catName").value="";save();renderAll()}
 function delCat(c){cats=cats.filter(x=>x!==c);items=items.map(i=>i.cat===c?{...i,cat:"Diğer"}:i);save();renderAll()}
-function saveItem(){let n=$("iName").value.trim();if(!n)return alert("Ad yaz.");let obj={id:editId||Date.now(),owner:current.role==="admin"&&adminViewing?adminViewing:current.email,name:n,code:$("iCode").value,cat:$("iCat").value,loc:$("iLoc").value,count:+$("iCount").value||0,min:+$("iMin").value||0,value:+$("iValue").value||0,photo:$("iPhoto").value,note:$("iNote").value};editId?items=items.map(i=>i.id===editId?obj:i):items.push(obj);editId=null;clearItem();save();renderAll()}
+function saveItem(){let n=$("iName").value.trim();if(!n)return alert("Ad yaz.");let obj={id:editId||Date.now(),owner:current.role==="admin"&&adminView?adminView:current.code,name:n,code:$("iCode").value,cat:$("iCat").value,loc:$("iLoc").value,count:+$("iCount").value||0,min:+$("iMin").value||0,value:+$("iValue").value||0,photo:$("iPhoto").value,note:$("iNote").value};editId?items=items.map(i=>i.id===editId?obj:i):items.push(obj);editId=null;clearItem();save();renderAll()}
 function clearItem(){["iName","iCode","iLoc","iCount","iMin","iValue","iPhoto","iNote"].forEach(id=>$(id).value="")}
 function editItem(id){let i=items.find(x=>x.id===id);editId=id;$("iName").value=i.name;$("iCode").value=i.code;$("iCat").value=i.cat;$("iLoc").value=i.loc;$("iCount").value=i.count;$("iMin").value=i.min;$("iValue").value=i.value;$("iPhoto").value=i.photo;$("iNote").value=i.note;show("stock")}
 function delItem(id){items=items.filter(i=>i.id!==id);save();renderAll()}
 function status(i){return i.count<=0?["Eksik","bad"]:i.count<i.min?["Az","warn"]:["Yeterli","ok"]}
 function card(i){let s=status(i);return `<div class="item">${i.photo?`<img class="photo" src="${i.photo}">`:""}<div><b>${i.name}</b><br>${i.cat} | ${i.loc||"-"}<br>Adet: ${i.count} | Değer: ${i.count*i.value} TL<br><span class="badge ${s[1]}">${s[0]}</span></div><div><button class="small success" onclick="editItem(${i.id})">Düzenle</button><button class="small danger" onclick="delItem(${i.id})">Sil</button></div></div>`}
 function renderItems(){$("itemList").innerHTML=myItems().map(card).join("")||"<p>Malzeme yok.</p>"}
-function renderHome(){let arr=myItems(),low=arr.filter(i=>i.count<i.min),val=arr.reduce((s,i)=>s+i.count*i.value,0);$("sTotal").innerText=arr.length;$("sLow").innerText=low.length;$("sCat").innerText=cats.length;$("sValue").innerText=val+" TL";$("homeItems").innerHTML=arr.slice(-6).map(card).join("")||"<p>Malzeme yok.</p>";$("notifications").innerHTML=low.map(i=>`<p>${i.name} az kaldı.</p>`).join("")||"<p>Bildirim yok.</p>";$("orderSummary").innerHTML=orders.filter(o=>o.owner===current.email).map(o=>`<p>${o.name} - ${o.status}</p>`).join("")||"<p>Sipariş yok.</p>"}
+function renderHome(){let arr=myItems(),low=arr.filter(i=>i.count<i.min),val=arr.reduce((s,i)=>s+i.count*i.value,0);$("sTotal").innerText=arr.length;$("sLow").innerText=low.length;$("sCat").innerText=cats.length;$("sValue").innerText=val+" TL";$("homeItems").innerHTML=arr.slice(-6).map(card).join("")||"<p>Malzeme yok.</p>";$("aiText").innerHTML=low.length?low.map(i=>`${i.name} az stokta.`).join("<br>"):"Stoklar iyi görünüyor."}
 function searchStock(){let q=$("qText").value.toLowerCase(),c=$("qCat").value;let r=myItems().filter(i=>(!q||i.name.toLowerCase().includes(q)||i.code.toLowerCase().includes(q)||i.loc.toLowerCase().includes(q))&&(!c||i.cat===c));$("searchList").innerHTML=r.map(card).join("")||"<p>Sonuç yok.</p>"}
-function quickSearch(){let q=$("globalSearch").value;if(!q)return;show("stockSearch");$("qText").value=q;searchStock()}
-function addOrder(){let o={id:Date.now(),owner:current.email,name:$("oName").value,count:+$("oCount").value||0,price:+$("oPrice").value||0,status:$("oStatus").value};orders.push(o);save();renderAll()}
-function renderOrders(){$("orderList").innerHTML=orders.filter(o=>current.role==="admin"||o.owner===current.email).map(o=>`<div class="item"><b>${o.name}</b><span>${o.count} x ${o.price} TL</span><span>${o.status}</span></div>`).join("")||"<p>Sipariş yok.</p>"}
-function saveProfile(){if($("pName").value)current.name=$("pName").value;if($("pPass").value)current.pass=$("pPass").value;if($("pPhoto").value)current.photo=$("pPhoto").value;save();renderAll()}
-function aiAnalyze(){let low=myItems().filter(i=>i.count<i.min);$("aiText").innerHTML=low.length?low.map(i=>`${i.name} az stokta.`).join("<br>"):"Stoklar iyi görünüyor."}
-function renderAdmin(){if(!current||current.role!=="admin")return;let q=$("adminSearch")?.value?.toLowerCase()||"";$("adminUsers").innerHTML=users.filter(u=>u.email.includes(q)||u.name.toLowerCase().includes(q)).map(u=>`<div class="item"><div><b>${u.name}</b><br>${u.email}<br>${u.role} | ${u.online?"Aktif":"Pasif"}<br>${u.last}</div><button class="small" onclick="viewUser('${u.email}')">Gör/Düzenle</button></div>`).join("");if(adminViewing){$("adminInventory").innerHTML=items.filter(i=>i.owner===adminViewing).map(card).join("")||"<p>Envanter boş.</p>"}}
-function viewUser(email){adminViewing=email;show("stock");renderAdmin()}
-function toggleTheme(){document.body.classList.toggle("dark")}
-function toggleGoogle(){$("googlePanel").classList.toggle("hidden")}
-function googleSearch(){let q=$("googleQuery").value;if(!q)return;$("googleFrame").src="https://www.google.com/search?igu=1&q="+encodeURIComponent(q)}
-function googleOpen(){let q=$("googleQuery").value;if(q)window.open("https://www.google.com/search?q="+encodeURIComponent(q),"_blank")}
-window.onload=()=>{let s=localStorage.session;if(s){let u=users.find(x=>x.email===s);if(u)start(u)}}
+function quickSearch(){let q=$("globalSearch").value;if(!q)return;show("search");$("qText").value=q;searchStock()}
+function addOrder(){orders.push({id:Date.now(),owner:current.code,name:$("oName").value,count:+$("oCount").value||0,price:+$("oPrice").value||0,status:$("oStatus").value});save();renderAll()}
+function renderOrders(){$("orderList").innerHTML=orders.filter(o=>current.role==="admin"||o.owner===current.code).map(o=>`<div class="item"><b>${o.name}</b><span>${o.count} x ${o.price} TL</span><span>${o.status}</span></div>`).join("")||"<p>Sipariş yok.</p>"}
+function addProject(){projects.push({id:Date.now(),owner:current.code,name:$("pName").value,parts:$("pParts").value});save();renderAll()}
+function renderProjects(){$("projectList").innerHTML=projects.filter(p=>current.role==="admin"||p.owner===current.code).map(p=>`<div class="item"><b>${p.name}</b><span>${p.parts}</span></div>`).join("")||"<p>Proje yok.</p>"}
+function sendMsg(){msgs.push({user:current.name,text:$("msgText").value});$("msgText").value="";save();renderAll()}
+function renderMsgs(){$("msgList").innerHTML=msgs.map(m=>`<div class="item"><b>${m.user}</b><span>${m.text}</span></div>`).join("")||"<p>Mesaj yok.</p>"}
+function saveProfile(){if($("prName").value)current.name=$("prName").value;if($("prPin").value)current.pin=$("prPin").value;if($("prPhoto").value)current.photo=$("prPhoto").value;save();renderAll()}
+function askAI(){let q=$("aiInput").value.toLowerCase(),arr=myItems(),low=arr.filter(i=>i.count<i.min);let a="Stok, kategori, proje ve sipariş analizi yapabilirim.";if(q.includes("eksik")||q.includes("az"))a=low.length?low.map(i=>`${i.name}: ${i.count}/${i.min}`).join("<br>"):"Az stok yok.";if(q.includes("proje"))a=projects.filter(p=>p.owner===current.code).map(p=>p.name).join("<br>")||"Proje yok.";$("aiChat").innerHTML+=`<div class="ai-msg"><b>Sen:</b> ${$("aiInput").value}</div><div class="ai-msg"><b>AI:</b><br>${a}</div>`;$("aiInput").value=""}
+function aiAnalyze(){show("ai");$("aiInput").value="eksik stok";askAI()}
+function renderAdmin(){if(!current||current.role!=="admin"||!$("adminUsers"))return;let q=$("adminSearch").value.toLowerCase();$("adminUsers").innerHTML=users.filter(u=>u.code.toLowerCase().includes(q)||u.name.toLowerCase().includes(q)).slice(0,100).map(u=>`<div class="item"><div><b>${u.name||"Boşta"}</b><br>${u.code}<br>${u.online?"Aktif":"Pasif"} | ${u.role}</div><button class="small" onclick="viewUser('${u.code}')">Gör/Düzenle</button></div>`).join("");$("adminInventory").innerHTML=adminView?items.filter(i=>i.owner===adminView).map(card).join("")||"<p>Envanter boş.</p>":"<p>Kullanıcı seç.</p>"}
+function viewUser(code){adminView=code;show("stock")}
+window.onload=()=>{let s=localStorage.session;if(s){let u=users.find(x=>x.code===s);if(u){current=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminBtn").classList.toggle("hidden",u.role!=="admin");renderAll();show("home")}}}
 save();
 </script>
 </body>
