@@ -25,6 +25,7 @@
     <h2>⚡ AtölyeAI</h2>
     <button onclick="showPage('dashboard')">🏠 Ana Sayfa</button>
     <button onclick="showPage('stock')">📦 Stoklar</button>
+    <button onclick="showPage('stockCheck')">🔎 Stok Sorgula</button>
     <button onclick="showPage('projects')">🛠️ Projeler</button>
     <button onclick="showPage('orders')">🛒 Siparişler</button>
     <button onclick="showPage('messages')">💬 Mesajlar</button>
@@ -123,6 +124,16 @@
       </div>
       <div id="stockList" class="list"></div>
     </section>
+    <section id="stockCheck" class="page hidden">
+  <h1>🔎 Stok Durumu Sorgula</h1>
+
+  <div class="form">
+    <input id="stockSearchInput" placeholder="Ürün adı veya kod yaz: LCD, UNO, SNS-001">
+    <button onclick="checkStock()">🔍 Sorgula</button>
+  </div>
+
+  <div id="stockCheckResult" class="list"></div>
+</section>
 
     <section id="projects" class="page hidden">
       <h1>🛠️ Proje Yönetimi</h1>
